@@ -21,11 +21,20 @@ def validate_model(cls, task_id):
     
     return model
 
+
 # Retrieve a model instance by its ID.
 @bp.get("/<task_id>")
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
     return task.convert_task_to_dict()
+
+
+# Get all tasks
+@bp.get("/")
+def get_all_tasks():
+    query = db.select(Task)
+    tasks = db.session.scalars(query).all()
+    return [task.convert_task_to_dict() for task in tasks]
 
 
 # Create new model
@@ -48,3 +57,28 @@ def create_model(cls, model_data):
 def create_new_task():
     request_body = request.get_json()
     return create_model(Task, request_body)
+
+
+# Update existing task
+@bp.put("/<task_id>")
+def update_task(task_id):
+    task = validate_model(Task, task_id)
+    task_json = request.get_json()
+
+    task.title = task_json["title"]
+    task.description = task_json["description"]
+
+    db.session.commit()    
+
+    return make_response("", 204)
+
+
+# Delete a task
+@bp.delete("/<task_id>")
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response("", 204)
