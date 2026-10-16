@@ -26,34 +26,34 @@ def validate_model(cls, task_id):
 @bp.get("/<task_id>")
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
-    return task.convert_task_to_dict()
+    return task.to_dict()
 
 
 # Get all tasks
-@bp.get("/")
+@bp.get("")
 def get_all_tasks():
     query = db.select(Task)
     tasks = db.session.scalars(query).all()
-    return [task.convert_task_to_dict() for task in tasks]
+    return [task.to_dict() for task in tasks]
 
 
 # Create new model
 def create_model(cls, model_data):
     try:
-        new_model = cls.convert_dict_to_task(model_data)
+        new_model = cls.from_dict(model_data)
         
-    except KeyError as error:
-        response = {"message": f"Invalid request: missing {error.args[0]}"}
+    except KeyError:
+        response = {"details": "Invalid data"}
         abort(make_response(response, 400))
     
     db.session.add(new_model)
     db.session.commit()
 
-    return new_model.convert_task_to_dict(), 201
+    return new_model.to_dict(), 201
 
 
 # Handle the creation of new instances of a model from a dictionary, returning the expected responses.
-@bp.post("/")
+@bp.post("")
 def create_new_task():
     request_body = request.get_json()
     return create_model(Task, request_body)

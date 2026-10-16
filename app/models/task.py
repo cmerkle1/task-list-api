@@ -10,7 +10,7 @@ class Task(db.Model):
 
 
     # Convert a task into a dict
-    def convert_task_to_dict(self):
+    def to_dict(self):
         task_dict = {}
         task_dict["id"] = self.id
         task_dict["title"] = self.title
@@ -21,7 +21,7 @@ class Task(db.Model):
 
     # Create task instance from dict
     @classmethod
-    def convert_dict_to_task(cls, task_data):
+    def from_dict(cls, task_data):
         
         new_task = cls(
             title=task_data["title"],
