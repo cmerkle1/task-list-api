@@ -3,6 +3,8 @@ from sqlalchemy import desc
 from app.models.task import Task
 import datetime
 from ..db import db
+import os
+import requests
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -111,7 +113,18 @@ def task_completed(task_id):
     task.completed_at = datetime.datetime.now()
     
     db.session.commit()    
-    
+
+    headers = {
+        "Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"
+    }
+    requests.post(
+        "https://slack.com/api/chat.postMessage",
+        headers=headers,
+        json={
+            "channel": "task_list_api_test",
+            "message": f"Someone completed the task {task.title}"
+        }
+    )
     response =  make_response("", 204)
     response.mimetype = "application/json"
 

@@ -12,7 +12,7 @@ def create_app(config=None):
 
     if config:
         # Merge `config` into the app's configuration
-        # to override the app's default settings for testing
+        # to override the app's default settings for testin
         app.config.update(config)
 
     db.init_app(app)
