@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, make_response, request
 from sqlalchemy import desc
 from app.models.task import Task
+import datetime
 from ..db import db
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
@@ -39,10 +40,12 @@ def get_all_tasks():
         query = db.select(Task)
         tasks = db.session.scalars(query).all()
 
+    # Sorts task by ascending order
     elif sort_order == "asc":
         asc_query = db.select(Task).order_by(Task.title)
         tasks = db.session.scalars(asc_query).all()
-    
+
+    # Sorts task by descending order
     elif sort_order == "desc":
         desc_query = db.select(Task).order_by(desc(Task.title))
         tasks = db.session.scalars(desc_query).all()
@@ -99,3 +102,30 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response("", 204)
+
+
+# Update completion status on a task
+@bp.patch("/<task_id>/mark_complete")
+def task_completed(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.datetime.now()
+    
+    db.session.commit()    
+    
+    response =  make_response("", 204)
+    response.mimetype = "application/json"
+
+    return response
+
+
+@bp.patch("/<task_id>/mark_incomplete")
+def task_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+
+    db.session.commit()
+
+    response =  make_response("", 204)
+    response.mimetype = "application/json"
+    
+    return response
