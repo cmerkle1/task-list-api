@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, make_response, request
+from sqlalchemy import desc
 from app.models.task import Task
 from ..db import db
 
@@ -32,8 +33,24 @@ def get_one_task(task_id):
 # Get all tasks
 @bp.get("")
 def get_all_tasks():
-    query = db.select(Task)
-    tasks = db.session.scalars(query).all()
+    sort_order = request.args.get("sort")
+
+    if sort_order is None:
+        query = db.select(Task)
+        tasks = db.session.scalars(query).all()
+
+    elif sort_order == "asc":
+        asc_query = db.select(Task).order_by(Task.title)
+        tasks = db.session.scalars(asc_query).all()
+    
+    elif sort_order == "desc":
+        desc_query = db.select(Task).order_by(desc(Task.title))
+        tasks = db.session.scalars(desc_query).all()
+
+    else:
+        response = "Invalid sort parameter"
+        abort(make_response(response , 400))
+
     return [task.to_dict() for task in tasks]
 
 
