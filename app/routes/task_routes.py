@@ -122,9 +122,10 @@ def task_completed(task_id):
         headers=headers,
         json={
             "channel": "task_list_api_test",
-            "message": f"Someone completed the task {task.title}"
+            "text": f"Someone just completed the task {task.title}"
         }
     )
+
     response =  make_response("", 204)
     response.mimetype = "application/json"
 
