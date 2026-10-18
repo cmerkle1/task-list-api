@@ -19,7 +19,9 @@ class Task(db.Model):
         task_dict["title"] = self.title
         task_dict["description"] = self.description
         task_dict["is_complete"] = self.completed_at is not None
-        task_dict["goal_id"] = self.goal_id
+        
+        if self.goal_id is not None:
+            task_dict["goal_id"] = self.goal_id
 
         return task_dict
 

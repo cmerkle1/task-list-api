@@ -1,5 +1,5 @@
 from flask import Blueprint, make_response, request
-from app.routes.task_routes import validate_model, create_model
+from app.routes.route_utilities import validate_model, create_model
 from app.models.goal import Goal
 from app.models.task import Task
 from ..db import db
